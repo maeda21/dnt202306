@@ -1940,7 +1940,7 @@ Dvec(pt1,pt2):=(
  tmpv=tmpv/|tmpv|;///Scale;
  pt2+0.35*tmpv/Scale;
 );
-inspect(A,"ptsize",3);
+inspect(A,"ptsize",7);
 inspect(B,"ptsize",3);
 inspect(P,"ptsize",3);
 Defvar(["Ra",4]);
@@ -1954,7 +1954,9 @@ mf(s):=(
   Q=Ra*[s,0];
   Listplot("APH",[A,P,H,A],["Color=[1,0,0,0]"]);
   Listplot("AQ",[A,Q],["Color=[1,0,0,0]"]);
-  Paramark("AHP",[A,H,P],[0.5,"Color=[1,0,0,0]"]);
+  if((P.x!=H.x) % (P.y!=H.y),
+    Paramark("AHP",[A,H,P],[0.5,"Color=[1,0,0,0]"]);
+  );
   Paramark("OQA",[[XMAX,0],Q,A],[0.5,"Color=[1,0,0,0]"]);
   Anglemark("PAQ",[P,A,Q],["Color=[1,0,0,0]"]);
   mm=ceil(length(agPAQ)/2);
@@ -1962,9 +1964,9 @@ mf(s):=(
   ptm=Dvec(A,ptm);
   if(s<2*pi,Expr(ptm,"c","t"));
   Circledata("2",[Ra*[s,1],Ra*[s+1,1]],[]);
-  Listplot("x",[[0,0],Ra*[s,0]],["dr,1.5","Color=[1,0,0,0]"]);
+  Listplot("x",[[0,0],Ra*[s,0]],["dr,2","Color=[1,0,0,0]"]);
   Circledata("3",[Ra*[s,1],Ra],
-      ["Rng=[3*pi/2-s,3*pi/2]","dr,1.5","Color=[1,0,0,0]"]);
+      ["Rng=[3*pi/2-s,3*pi/2]","dr,2","Color=[1,0,0,0]"]);
   if(s>0,
     rng=Assign("t=[0,s]",["s",s]);
     Paramplot("2","Ra*[t-sin(t),1-cos(t)]",rng,
@@ -2021,12 +2023,14 @@ Listplot("axy",[[0,-0.5/Scale],
                 [0,2*Ra+0.8/Scale]]);
 Expr([Ra*(2*pi+1)+0.5/Scale,0],"e1","x");
 Expr([0,2*Ra+0.8/Scale],"n1","y");
+Letter([0.5,-0.9],"se","A$'$を左右に動かせ");
 
 A.y=Ra;
 if(A.x<0,A.x=0);
 if(A.x/Ra>2*pi,A.x=Ra*2*pi);
 B.xy=[0,Ra];
 
+println(A.x);
 mf(A.x/Ra);
 
 Htickmark([Ra*pi,"a\pi",2*Ra*pi,"2a\pi"]);
@@ -2053,9 +2057,9 @@ var cdy = CindyJS({
   geometry: [
     {name: "SW", type: "Free", pos: [4.0, 0.8571428571428571, -0.5714285714285714], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
     {name: "NE", type: "Free", pos: [4.0, 1.4363716153078159, 0.13057923775525598], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
-    {name: "P", type: "Free", pos: [-1.379419711830278, -4.0, -2.175342649670022], color: [1.0, 0.0, 0.0], labeled: false, size: 3.0, border: true },
-    {name: "A", type: "Free", pos: [4.0, 4.0, 1.0], color: [1.0, 0.0, 0.0], labeled: false, size: 3.0, border: true },
-    {name: "B", type: "Free", pos: [-0.0, -4.0, -1.0], color: [1.0, 0.0, 0.0], labeled: false, size: 3.0, border: true }
+    {name: "P", type: "Free", pos: [-1.0646531867413414, -4.0, -3.440882855308248], color: [1.0, 0.0, 0.0], labeled: false, size: 3.0, border: true },
+    {name: "B", type: "Free", pos: [-0.0, -4.0, -1.0], color: [1.0, 0.0, 0.0], labeled: false, size: 3.0, border: true },
+    {name: "A", type: "Free", pos: [-3.128730150396, -4.0, -1.0], color: [1.0, 0.0, 0.0], labeled: false, size: 7.0, border: true }
   ],
   ports: [{
     width: 1314,
@@ -2068,6 +2072,7 @@ var cdy = CindyJS({
     background: "rgb(255,255,255)"
   }],
   csconsole: false,
+  use: ["katex"],
   cinderella: {build: 2074, version: [3, 0, 2074]}
 });
     </script>

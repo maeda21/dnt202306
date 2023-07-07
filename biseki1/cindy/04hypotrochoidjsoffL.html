@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     
-    <title>06epitrochoid.cdy</title>
+    <title>04hypotrochoid.cdy</title>
     <style type="text/css">
         * {
             margin: 0px;
@@ -223,160 +223,25 @@ Strictmove(pCorg,sep):=(
     );
   );
 );
-Slider(ptstr,p1,p2):=Slider(ptstr,p1,p2,[]);
-Slider(ptstr,p1,p2,optionsorg):=(//220903
-  regional(pA,pB,pC,options,color,thick,sep,
-        tmp,tmp1,tmp2);
-  options=optionsorg;
-  color="Color=0.6*[0,0,1]"; //190120from
-  thick="size->2";
-  sep=0.3; //190824
-  forall(options,
-    tmp=Toupper(substring(#,0,1));
-    if(tmp=="C",
-      color=#;
-      options=remove(options,[tmp]);//220903
-    );
-    if(tmp=="T",
-      tmp=Strsplit(#,"=");
-      thick="size->"+tmp_2;
-      options=remove(options,[tmp]);//220903
-    );
-    if(tmp=="S",//190824from
-      tmp=Strsplit(#,"=");
-      sep=parse(tmp_2);
-      options=remove(options,[tmp]);//220903
-    ); //190824to
-  );
-  tmp=Indexall(ptstr,"-");
-  if(length(tmp)>0,
-    pA=substring(ptstr,0,tmp_1-1); //190824from
-    pC=substring(ptstr,tmp_1,tmp_2-1);
-    pB=substring(ptstr,tmp_2,length(ptstr));
-    parse(pA).xy=p1;
-    parse(pB).xy=p2; //190824to
-    tmp1=pC+"position"; //190827from
-    if(!islist(parse(tmp1)),
-      tmp2=parse(pC).xy;
-      if(|tmp2-p1|<0.1,tmp2=p1+0.1*(p2-p1)/|p2-p1|);
-      if(|tmp2-p2|<0.1,tmp2=p2+0.1*(p1-p2)/|p1-p2|);
-      tmp=tmp1+"="+textformat(tmp2,10)+";";
-      parse(tmp);
-      parse(pC).xy=tmp2;
-    ); //190827to
-    PTEXCEPTION=concat(TEXCEPTION,[pA,pC,pB]);
-  ,
-    pC=ptstr; pA=pC+"l"; pB=pC+"r"; 
-    PTEXCEPTION=concat(PTEXCEPTION,[pC]);
-  );
-  options=concat(options,["Msg=n",color,thick]); //220903[2lines]
-  if(!contains(options,"nodisp"),options=append(options,"notex"));
-  Listplot(pA+pB,[p1,p2],options);
-  Putonseg(pC,parse("sg"+pA+pB));
-);
-Strsplit(strorg,key):=( // 210422 renewed
-  regional(str,ctr,tmp,tmp1,out);
-  str=strorg+key; 
-  out=[];
-  tmp=indexof(str,key);
-  while(tmp>0,
-    tmp1=substring(str,0,tmp-1);
-    out=append(out,tmp1);
-    str=substring(str,tmp-1+length(key),length(str));
-    tmp=indexof(str,key);
-  );
-  out;
-);
-Indexall(str,key):=(
-  regional(rest,out,flg,tmp,tmp1,);
-  out=[];
-  rest=str;
-  flg=0;
-  forall(1..(length(str)),
-    if(flg==0,
-      tmp=indexof(rest,key);
-      if(tmp>0,
-        tmp1=tmp+length(str)-length(rest);
-        out=append(out,tmp1);
-        rest=substring(rest,tmp,length(rest));
-      ,
-        flg=1;
-      );
-    );
-  );
-  out;
-);
-Listplot(list):=Listplot(list,[]);
-Listplot(Arg1,Arg2):=(
-  regional(name,list,options,str);
-  if(isstring(Arg1),
-    name=Arg1;
-    list=Arg2;
-    Listplot(name,list,[]);
-  ,
-    list=Arg1;
-    options=Arg2;
-    name="";
-    forall(list, // 16.10.07from
-       name=name+#.name;
-    );// 16.10.07until
-    Listplot(name,list,options);
-  );
-);
-Listplot(nm,list,options):=(
-  regional(name,cutend,tmp,tmp1,tmp2,ptlist,Ltype,opcindy,Noflg,eqL,Msg,color,color4);
-  if(substring(nm,0,1)=="-",  // 16.01.27 from
-    name=substring(nm,1,length(nm));
-  ,
-    name="sg"+nm;
-  ); // upto
-  tmp=Divoptions(options);
-  Ltype=tmp_1;
-  Noflg=tmp_2;
+Setax(arglistorg):=(
+  regional(arglist,st,nn,tmp,eqL); 
+  tmp=Divoptions(arglistorg); //190901from
   eqL=tmp_5;
-  color=tmp_(length(tmp)-2); color4=Colorrgb2cmyk(color); //200618
-  opcindy=tmp_(length(tmp));
-  Msg="Y";  //190206
- Msg="N"; //
-  cutend=[0,0];//180719
-  forall(eqL,
-    tmp=Strsplit(#,"=");
-    tmp1=Toupper(substring(tmp_1,0,1));
-    if(tmp1=="M",
-      Msg=Toupper(substring(tmp_2,0,1));
-    );
-    if(tmp1=="C",//180719from
-      tmp2=replace(tmp_2,"[","");
-      tmp2=replace(tmp2,"]","");
-      cutend=tokenize(tmp2,",");
-      if(length(cutend)==1,cutend=[cutend_1,cutend_1]);     
-    );//180719to
+  arglist=remove(arglistorg,eqL);
+  if(length(arglist)==0,
+    arglist=["l","x","e","y","n","O","sw"];
+  ); //190901to
+  st=1; nn=1; 
+  if(isreal(arglist_1),
+    st=2;
+    nn=arglist_1;
   );
-  if(Noflg<3,
-    if(Msg=="Y", //190206
-      println("generate Listplot "+name);
-    );
-    if(isstring(list_1),tmp=apply(list,parse(#)),tmp=list); // 15.03.24
-    ptlist=apply(tmp,Pcrd(#));
-    if(|cutend|>0,//180719from
-      tmp=ptlist_(length(ptlist))-ptlist_1;
-      tmp=tmp/|tmp|;
-      ptlist_1=ptlist_1+tmp*cutend_1;
-      ptlist_(length(ptlist))=ptlist_(length(ptlist))-tmp*cutend_2;
-    );//180719to
-    tmp=name+"="+Textformat(ptlist,5)+";"; //190415
-    parse(tmp);
-  );
-  if(Noflg<3, //190818
-    if(isstring(Ltype),
-      Ltype=Getlinestyle(text(Noflg)+Ltype,name);
-    ,
-      if(Noflg==1,Ltype=0);
-    );
-    GCLIST=append(GCLIST,[name,Ltype,opcindy]);
-  );
-  tmp1=apply(list,Lcrd(#));
-  tmp1;
+  forall(st..(length(arglist)),
+    tmp=arglist_#;
+    if(length(tmp)>0,AXSTYLE_1_nn=tmp);
+    nn=nn+1;
+  ); 
+  AXSTYLE=[AXSTYLE_1,eqL]; //190901,02
 );
 Divoptions(options):=(
   regional(Ltype,Noflg,Inflg,Outflg,eqL,realL,strL,
@@ -482,6 +347,19 @@ Divoptions(options):=(
     opcindy=opcindy+",color->"+text(tmp);
   );
   [Ltype,Noflg,Inflg,Outflg,eqL,realL,strL,color,opstr,opcindy];
+);
+Strsplit(strorg,key):=( // 210422 renewed
+  regional(str,ctr,tmp,tmp1,out);
+  str=strorg+key; 
+  out=[];
+  tmp=indexof(str,key);
+  while(tmp>0,
+    tmp1=substring(str,0,tmp-1);
+    out=append(out,tmp1);
+    str=substring(str,tmp-1+length(key),length(str));
+    tmp=indexof(str,key);
+  );
+  out;
 );
 Colorname2cmyk(name):=( //181212
   regional(dL,code,tmp);
@@ -606,6 +484,95 @@ Colorcmyk2rgb(clr):=(
   );
   clrnew;
 );
+Animationparam(start,ratio,stop):=( //190524
+  regional(rng);
+  if(islist(stop),rng=stop,rng=[start,stop]);
+  if(isreal(Animeflg),
+    if(Animeflg==1,
+      sstart=Dirflg*ratio*seconds()+sorg;
+    );
+  ,
+    Current=start;
+    sstart=start;
+  );
+  if((sstart<=rng_1)%(sstart>=rng_2), //190528
+    if(sstart<=rng_1,sstart=rng_1, sstart=rng_2); //190528
+    stopanimation();
+  );
+  sstart;
+);
+Listplot(list):=Listplot(list,[]);
+Listplot(Arg1,Arg2):=(
+  regional(name,list,options,str);
+  if(isstring(Arg1),
+    name=Arg1;
+    list=Arg2;
+    Listplot(name,list,[]);
+  ,
+    list=Arg1;
+    options=Arg2;
+    name="";
+    forall(list, // 16.10.07from
+       name=name+#.name;
+    );// 16.10.07until
+    Listplot(name,list,options);
+  );
+);
+Listplot(nm,list,options):=(
+  regional(name,cutend,tmp,tmp1,tmp2,ptlist,Ltype,opcindy,Noflg,eqL,Msg,color,color4);
+  if(substring(nm,0,1)=="-",  // 16.01.27 from
+    name=substring(nm,1,length(nm));
+  ,
+    name="sg"+nm;
+  ); // upto
+  tmp=Divoptions(options);
+  Ltype=tmp_1;
+  Noflg=tmp_2;
+  eqL=tmp_5;
+  color=tmp_(length(tmp)-2); color4=Colorrgb2cmyk(color); //200618
+  opcindy=tmp_(length(tmp));
+  Msg="Y";  //190206
+ Msg="N"; //
+  cutend=[0,0];//180719
+  forall(eqL,
+    tmp=Strsplit(#,"=");
+    tmp1=Toupper(substring(tmp_1,0,1));
+    if(tmp1=="M",
+      Msg=Toupper(substring(tmp_2,0,1));
+    );
+    if(tmp1=="C",//180719from
+      tmp2=replace(tmp_2,"[","");
+      tmp2=replace(tmp2,"]","");
+      cutend=tokenize(tmp2,",");
+      if(length(cutend)==1,cutend=[cutend_1,cutend_1]);     
+    );//180719to
+  );
+  if(Noflg<3,
+    if(Msg=="Y", //190206
+      println("generate Listplot "+name);
+    );
+    if(isstring(list_1),tmp=apply(list,parse(#)),tmp=list); // 15.03.24
+    ptlist=apply(tmp,Pcrd(#));
+    if(|cutend|>0,//180719from
+      tmp=ptlist_(length(ptlist))-ptlist_1;
+      tmp=tmp/|tmp|;
+      ptlist_1=ptlist_1+tmp*cutend_1;
+      ptlist_(length(ptlist))=ptlist_(length(ptlist))-tmp*cutend_2;
+    );//180719to
+    tmp=name+"="+Textformat(ptlist,5)+";"; //190415
+    parse(tmp);
+  );
+  if(Noflg<3, //190818
+    if(isstring(Ltype),
+      Ltype=Getlinestyle(text(Noflg)+Ltype,name);
+    ,
+      if(Noflg==1,Ltype=0);
+    );
+    GCLIST=append(GCLIST,[name,Ltype,opcindy]);
+  );
+  tmp1=apply(list,Lcrd(#));
+  tmp1;
+);
 Colorrgb2cmyk(clr):=(
   regional(clrnew,tmp,black);
   if(length(clr)==3, //200618
@@ -694,57 +661,6 @@ Lcrd(pt):=(
     tmp=pt;
   );
   re(tmp); //191231
-);
-Putonseg(name,sgstr):=(
-  regional(seg,p1,p2);
-  if(isstring(sgstr),seg=parse(sgstr),seg=sgstr);
-  Putonseg(name,LLcrd(seg_1),LLcrd(seg_2));
-);
-Putonseg(name,p1,p2):=Putonseg(name,p1,p2,[]);
-Putonseg(name,p1org,p2org,options):=(
-  regional(Eps,par,p1,p2,dx,dy,p,tmp,tmp1,tmp2);
-  Eps=10^(-5);
-  par=0.5;
-  tmp=Divoptions(options);
-  if(length(tmp_6)>0,
-    par=tmp_6_1;
-  );
-  p1=Lcrd(p1org);//16.10.11from
-  p2=Lcrd(p2org);
-  p1=Pcrd(p1); p2=Pcrd(p2); //190120
-  dx=p2_1-p1_1;
-  dy=p2_2-p1_2;
-  p=parse(name+".xy");
-  if(abs(dx)>abs(dy), //190120from
-    if(p1_1>p2_1,tmp=p1;p1=p2;p2=tmp);
-    if(p_1<p1_1,parse(name+".xy="+Textformat(p1,10));p=p1);
-    if(p_1>p2_1,parse(name+".xy="+Textformat(p2,10));p=p2);
-    tmp=(p2_2-p1_2)/(p2_1-p1_1)*(p_1-p1_1)+p1_2;
-    parse(name+".y="+tmp+";"); //190415
-  ,
-    if(p1_2>p2_2,tmp=p1;p1=p2;p2=tmp);
-    if(p_2<p1_2,parse(name+".xy="+Textformat(p1,10));p=p1);
-    if(p_2>p2_2,parse(name+".xy="+Textformat(p2,10));p=p2);
-    tmp=(p2_1-p1_1)/(p2_2-p1_2)*(p_2-p1_2)+p1_1;
-    parse(name+".x="+tmp+";"); //190415
-  ); //190120to
-);
-Animationparam(start,ratio,stop):=( //190524
-  regional(rng);
-  if(islist(stop),rng=stop,rng=[start,stop]);
-  if(isreal(Animeflg),
-    if(Animeflg==1,
-      sstart=Dirflg*ratio*seconds()+sorg;
-    );
-  ,
-    Current=start;
-    sstart=start;
-  );
-  if((sstart<=rng_1)%(sstart>=rng_2), //190528
-    if(sstart<=rng_1,sstart=rng_1, sstart=rng_2); //190528
-    stopanimation();
-  );
-  sstart;
 );
 Circledata(cenrad):=Circledata(cenrad,[]);
 Circledata(para1,para2):=(
@@ -848,407 +764,6 @@ Circledata(nm,cenrad,options):=(
     GCLIST=append(GCLIST,[name,Ltype,opcindy]);
   );
   Out;
-);
-Translatedata(nm,plist,mov):=Translatedata(nm,plist,mov,[]);
-Translatedata(nm,plist,mov,optionorg):=(
-  regional(options,tmp,tmp1,tmp2,pdata,Cx,Cy,PdL,Nj,Njj,Kj,eqL,
-           opcindy,X2,Y2,Ltype,Noflg,name,color,color4,leveL,msgflg);
-  if(substring(nm,0,1)=="-", //210423from
-    name=substring(nm,1,length(nm));
-  ,
-    name="tr"+nm;
-  ); //210423to
-  options=optionorg; //190425
-  tmp=Divoptions(options);
-  Ltype=tmp_1;
-  Noflg=tmp_2;
-  eqL=tmp_5; //190424
-  color=tmp_(length(tmp)-2); color4=Colorrgb2cmyk(color); //200618
-  opcindy=tmp_(length(tmp));
-  msgflg="Y"; //190425from
-  forall(eqL,
-    tmp=Strsplit(#,"=");
-    tmp1=Toupper(substring(tmp_1,0,1));
-    if(tmp1=="M",
-      msgflg=Toupper(substring(tmp_2,0,1));
-      options=remove(options,[#]);
-    );
-    if(tmp1=="S", //210423from
-      options=remove(options,[#]);
-    ); //210423to
-  ); //190425to
-  pdata=plist;
-  if(isstring(pdata),pdata=[pdata]);
-  if(!isstring(pdata_1) & Measuredepth(pdata)==1,
-      pdata=[pdata];
-  );
-  tmp=Lcrd(mov);
-  Cx=tmp_1; Cy=tmp_2;
-  PdL=[];
-  forall(pdata,Njj,
-    if(isstring(Njj),Kj=parse(Njj),Kj=Njj);
-    if(Measuredepth(Kj)==1,Kj=[Kj]);
-    tmp2=[];
-    forall(Kj,Nj,
-      tmp1=[];
-      forall(Nj,
-        tmp=LLcrd(#);
-        X2=tmp_1+Cx;         
-        Y2=tmp_2+Cy;    
-        tmp1=concat(tmp1,[[X2,Y2]]);
-      );
-      if(length(tmp1)==1, //210423from
-        Pointdata("-"+name,tmp1,optionorg);
-      ,
-        tmp2=concat(tmp2,[tmp1]);
-        PdL=concat(PdL,tmp2);
-      );  //210423to
-    );
-  );
-  if(length(PdL)>0,
-    if(Noflg<3,
-      if(msgflg=="Y", //190425
-        println("generate Translatedata "+name);
-      );
-      tmp1=[];
-      forall(PdL,tmp2,
-        tmp=apply(tmp2,Pcrd(#));
-        tmp1=append(tmp1,tmp);
-      );
-      if(length(tmp1)==1,tmp1=tmp1_1);
-      tmp=name+"="+Textformat(tmp1,10)+";"; //190415
-      parse(tmp);
-    );
-    if(Noflg<3, //190818
-      if(isstring(Ltype),
-        Ltype=Getlinestyle(text(Noflg)+Ltype,name);
-      ,
-        if(Noflg==1,Ltype=0);
-      );
-      GCLIST=append(GCLIST,[name,Ltype,opcindy]);
-    );
-  );
-  PdL;
-);
-Measuredepth(list):=( //190423
-  regional(str,nn,tmp,tmp1,tmp2);
-  str=text(list);
-  tmp1=Indexall(str,"[");
-  tmp2=select(tmp1,!contains(tmp1,#+1));
-  nn=tmp2_1;
-  tmp1=substring(str,nn,length(str));
-  tmp=indexof(tmp1,",");
-  tmp1=substring(tmp1,0,tmp-1);
-  if(!ispoint(parse(tmp1)),
-    nn=nn-1;
-  );
-  nn;
-);
-Pointdata(nm,list):=Pointdata(nm,list,[]);
-Pointdata(nm,listorg,optionsorg):=(
-  regional(list,name,opstr,opcindy,Msg,options,Ltype,
-              Noflg,eqL,color,color4,dispflg,//220715
-              size,inside,incolor,ratio,tmp,tmp1,tmp2,tmp3,
-              ngc1,ngc2,ng1,ng2,nc1,nc2);
-  if(substring(nm,0,1)=="-", //200510[2lines]
-    name=substring(nm,1,length(nm));
-  ,
-    name="pt"+nm;
-  );
-  options=optionsorg; //200512
-  tmp=Divoptions(options);
-  Ltype=tmp_1;
-  Noflg=tmp_2;
-  eqL=tmp_5;
-  opstr=tmp_(length(tmp)-1);
-  color=tmp_(length(tmp)-2);
-  color4=Colorrgb2cmyk(color);
-  size="1";
-  dispflg="Y";
-  inside="Y"; //200512
-  incolor="";
-  ratio=0.95; //200708,0813
-  border="Y";
-  Msg="Y";
- Msg="N"; //
-  forall(eqL,
-    tmp=Strsplit(#,"=");
-    tmp1=Toupper(substring(tmp_1,0,1));
-    if(tmp1=="S",
-      size=tmp_2; //190406[2lines]
-      tmp1=parse(size);
-      options=remove(options,[#]);
-    );
-    if(tmp1=="D", //181030from
-      dispflg=Toupper(substring(tmp_2,0,1));
-      options=remove(options,[#]);
-    );
-    if(tmp1=="I", //190628from
-      inside=tmp_2; //201027from
-      if(substring(inside,0,1)!="[",
-        tmp2=indexof(tmp_2,",");
-        if(tmp2>0,
-          ratio=parse(substring(tmp_2,tmp2,length(tmp_2)));
-          inside=substring(tmp_2,0,tmp2-1); //201027
-        ,
-          inside=tmp_2; 
-        ); 
-      ); //201027to
-      if(contains(["0","N","NO","1","Y","YES"],Toupper(inside)), //200519from
-        if(contains(["0","N","NO"],Toupper(inside)),inside="N",inside="Y");
-      ,
-        incolor=inside;
-        inside="N";
-      ); //200519to
-      options=remove(options,[#]);
-    );
-    if(tmp1=="M", //190206from
-      Msg=Toupper(substring(tmp_2,0,1));
-    ); //190206to
-  );
-  if(dispflg=="Y", 
-    if(Msg=="Y", //190206
-      println("generate pointdata "+name);
-    );
-  ); //181030to
-  ngc1=length(GCLIST)+1; //210422[2lines
-  ng1=length(GLIST)+1;
-  nc1=length(COM2ndlist)+1;
-  if(isstring(listorg),
-    list=parse(listorg);
-  ,
-    list=listorg;
-  ); //17.10.23
-  if(!islist(list),list=[list]); //200510from
-  list=apply(list,if(ispoint(#),Lcrd(#),#));
-  if(Measuredepth(list)==0,list=[list]);
-  tmp1=Textformat(list,6);
-  if(length(list)>1,tmp2=apply(list,[#]),tmp2=list); //200524
-  tmp2=Textformat(tmp2,6);
-  tmp=name+"="+tmp2+";"; //190415
-  parse(tmp);
-  if(Noflg<3,
-    tmp=RSform(tmp1,2);
-  );
-  if(Noflg<2, //210602
-    tmp1=parse(size)*TenSizeInit;
-    forall(1..(length(list)),
-      if(inside=="N", //210602from
-        Scaledata(tmp2+"i",["cr"+tmp2],1,1/SCALEY,//230423[2line]
-                     ["Color="+color,"Msg=n"]);
-        if(length(incolor)>0, //200519from
-        );
-      ,
-        tmp=[tmp3_1,"Color="+color,"Msg=n"]; //220722from
-        if(Noflg==1,tmp=prepend("notex",tmp));
-      ); //210602to
-      tmp=round(10*sqrt(parse(size))); //201027from (moved)
-      if(Noflg==0,options=[Ltype,"Color="+text(color),"Num="+text(tmp)]);
-      if(Noflg==1,options=["notex",Ltype,"Color="+text(color),"Num="+text(tmp)]);
-      if(Noflg==2,options=["nodisp"]);
-      options=concat(options,[tmp3_1,"Msg=n"]);  //201027to
-    ); 
-  );
-  ngc2=length(GCLIST); //210422[5lines]
-  ng2=length(GLIST);
-  nc2=length(COM2ndlist);
-  tmp=[name,list,GCLIST_(ngc1..ngc2),
-               GLIST_(ng1..ng2),COM2ndlist_(nc1..nc2)];  
-  PointDataList=append(PointDataList,tmp);
-  list;
-);
-Scaledata(nm,plist,ratioV):=(
-  regional(tmp);
-  tmp=ratioV; //180603from
-  if(!islist(tmp),tmp=[tmp,tmp]);
-  tmp=Lcrd(tmp);//180603to
-  Scaledata(nm,plist,tmp_1,tmp_2,[]);
-);
-Scaledata(nm,plist,Arg1,Arg2):=(
-  regional(tmp,options);
-  if(islist(Arg2),
-    tmp=Arg1;//180603[2lines]
-    if(!islist(tmp),tmp=[tmp,tmp]);
-    tmp=Lcrd(tmp);
-    options=Arg2;
-    Scaledata(nm,plist,tmp_1,tmp_2,options);
-  ,
-    Scaledata(nm,plist,Arg1,Arg2,[]);
-  );
-);
-Scaledata(nm,plist,rx,ry,optionorg):=(
-  regional(tmp,tmp1,tmp2,pdata,Theta,Pt,Cx,Cy,PdL,options,eqL,
-      opcindy,Nj,Njj,Kj,X2,Y2,Ltype,Noflg,name,color,color4,msgflg);
-  if(substring(nm,0,1)=="-", //210423from
-    name=substring(nm,1,length(nm));
-  ,
-    name="sc"+nm;
-  ); //210423to
-  options=optionorg;
-  Pt=[0,0];
-  tmp=Divoptions(options);
-  Ltype=tmp_1;
-  Noflg=tmp_2;
-  eqL=tmp_5;
-  color=tmp_(length(tmp)-2);
-  color4=Colorrgb2cmyk(color); //200618
-  opcindy=tmp_(length(tmp));
-  tmp1=tmp_6;
-  if(length(tmp1)>0,
-    Pt=Lcrd(tmp1_1);
-  );
-  msgflg="Y"; //190425from
-  forall(eqL,
-    tmp=Strsplit(#,"=");
-    tmp1=Toupper(substring(tmp_1,0,1));
-    if(tmp1=="M",
-      msgflg=Toupper(substring(tmp_2,0,1));
-      options=remove(options,[#]);
-    );
-    if(tmp1=="S", //210423from
-      options=remove(options,[#]);
-    ); //210423to
-  ); //190425to
-  pdata=plist;
-  if(isstring(pdata),pdata=[pdata]);
-  if(!isstring(pdata_1) & Measuredepth(pdata)==1,
-      pdata=[pdata];
-  );
-  Cx=Pt_1; Cy=Pt_2;
-  PdL=[];
-  forall(pdata,Njj,
-    if(isstring(Njj),Kj=parse(Njj),Kj=Njj);
-    if(Measuredepth(Kj)==1,Kj=[Kj]);
-    tmp2=[];
-    forall(Kj,Nj,
-      tmp1=[];
-      forall(Nj,
-        tmp=LLcrd(#);
-        X2=Cx+rx*(tmp_1-Cx);
-        Y2=Cy+ry*(tmp_2-Cy);
-        tmp1=concat(tmp1,[[X2,Y2]]);
-      );
-      if(length(tmp1)==1, //210423from
-        Pointdata("-"+name,tmp1,optionorg);
-      ,
-        tmp2=concat(tmp2,[tmp1]);
-        PdL=concat(PdL,tmp2);
-      );  //210423to
-    );
-  );
-  if(length(PdL)>0,
-    if(Noflg<3,
-      if(msgflg=="Y",
-        println("generate Scaledata "+name);
-      );
-      tmp1=[];
-      forall(PdL,tmp2,
-        tmp=apply(tmp2,Pcrd(#));
-        tmp1=append(tmp1,tmp);
-      );
-      if(length(tmp1)==1,tmp1=tmp1_1);
-      tmp=name+"="+Textformat(tmp1,10)+";"; //190415
-      parse(tmp);
-    );
-    if(Noflg<3, //190818
-      if(isstring(Ltype),
-        Ltype=Getlinestyle(text(Noflg)+Ltype,name);
-      ,
-        if(Noflg==1,Ltype=0);
-      );
-      GCLIST=append(GCLIST,[name,Ltype,opcindy]);
-    );
-  );
-  PdL;
-);
-Rotatedata(nm,plist,Theta):=Rotatedata(nm,plist,Theta,[]);
-Rotatedata(nm,plist,angle,optionorg):=(
-  regional(tmp,tmp1,tmp2,pdata,Theta,Pt,Cx,Cy,PdLL,PdL,options,
-    opcindy,eqL,msgflg,ptL,Nj,Njj,Kj,Mj,X1,Y1,X2,Y2,
-    Ltype,Noflg,name,color,color4);
-  if(substring(nm,0,1)=="-", //210423from
-    name=substring(nm,1,length(nm));
-  ,
-    name="rt"+nm;
-  ); //210423to
-  options=optionorg;
-  Pt=[0,0];
-  tmp=Divoptions(options);
-  Ltype=tmp_1;
-  Noflg=tmp_2;
-  eqL=tmp_5;
-  color=tmp_(length(tmp)-2);color4=Colorrgb2cmyk(color); //200626
-  opcindy=tmp_(length(tmp));
-  tmp1=tmp_6;
-  if(length(tmp1)>0,Pt=Lcrd(tmp1_1));
-  msgflg="Y"; //190425from
-  forall(eqL,
-    tmp=Strsplit(#,"=");
-    tmp1=Toupper(substring(tmp_1,0,1));
-    if(tmp1=="M",
-      msgflg=Toupper(substring(tmp_2,0,1));
-      options=remove(options,[#]);
-    );
-    if(tmp1=="S", //210423from
-      options=remove(options,[#]);
-    ); //210423to
-  ); //190425to
-  pdata=plist;
-  if(isstring(pdata),pdata=[pdata]);
-  if(!isstring(pdata_1) & Measuredepth(pdata)==1,
-      pdata=[pdata];
-  );
-  if(isstring(angle),Theta=parse(angle),Theta=angle);
-  Cx=Pt_1; Cy=Pt_2;
-  PdL=[];
-  ptL=[];
-  forall(pdata,Njj,
-    if(isstring(Njj),Kj=parse(Njj),Kj=Njj);
-    if(Measuredepth(Kj)==0,Kj=[Kj]); //17.11.24
-    if(Measuredepth(Kj)==1,Kj=[Kj]);
-    tmp2=[];
-    forall(Kj,Nj,
-      tmp1=[];
-      forall(Nj,
-        tmp=LLcrd(#);
-        X1=tmp_1;         
-        Y1=tmp_2;    
-        X2=Cx+(X1-Cx)*cos(Theta)-(Y1-Cy)*sin(Theta);
-        Y2=Cy+(X1-Cx)*sin(Theta)+(Y1-Cy)*cos(Theta); 
-        tmp1=concat(tmp1,[[X2,Y2]]);
-      );
-      if(length(tmp1)==1, //210423from
-        Pointdata("-"+name,tmp1,optionorg);
-      ,
-        tmp2=concat(tmp2,[tmp1]);
-        PdL=concat(PdL,tmp2);
-      );  //210423to
-    );
-  );
-  if(length(PdL)>0,
-    if(Noflg<3,
-      if(msgflg=="Y",
-        println("generate Rotatedata "+name);
-      );
-      tmp1=[];
-      forall(PdL,tmp2,
-        tmp=apply(tmp2,Pcrd(#));
-        tmp1=append(tmp1,tmp);
-      );
-      if(length(tmp1)==1,tmp1=tmp1_1);
-      tmp=name+"="+Textformat(tmp1,10)+";"; //190415
-      parse(tmp);
-    );
-    if(Noflg<3, //190818
-      if(isstring(Ltype),
-        Ltype=Getlinestyle(text(Noflg)+Ltype,name);
-      ,
-        if(Noflg==1,Ltype=0);
-      );
-      GCLIST=append(GCLIST,[name,Ltype,opcindy]);
-    );
-  );
-  pdL;
 );
 Windispg():=(
   if(ADDAXES=="1", //181215from
@@ -1693,27 +1208,61 @@ DqDq(str):=(
 Addax(param):=(
   ADDAXES=text(param);
 );
+Measuredepth(list):=( //190423
+  regional(str,nn,tmp,tmp1,tmp2);
+  str=text(list);
+  tmp1=Indexall(str,"[");
+  tmp2=select(tmp1,!contains(tmp1,#+1));
+  nn=tmp2_1;
+  tmp1=substring(str,nn,length(str));
+  tmp=indexof(tmp1,",");
+  tmp1=substring(tmp1,0,tmp-1);
+  if(!ispoint(parse(tmp1)),
+    nn=nn-1;
+  );
+  nn;
+);
+Indexall(str,key):=(
+  regional(rest,out,flg,tmp,tmp1,);
+  out=[];
+  rest=str;
+  flg=0;
+  forall(1..(length(str)),
+    if(flg==0,
+      tmp=indexof(rest,key);
+      if(tmp>0,
+        tmp1=tmp+length(str)-length(rest);
+        out=append(out,tmp1);
+        rest=substring(rest,tmp,length(rest));
+      ,
+        flg=1;
+      );
+    );
+  );
+  out;
+);
 Ketcindyjsfigure=0;
 Ketcindyjsscale=1;
 
 pL=[];
 sL=[];
-
+rad=4;
+nflag=1;
+tt0=0;
+tt1=0;
+rssq=[2,rad/2,2*rad/3,3*rad/4,4*rad/5,5*rad/6,rad/3,5*rad/8];
 mf(s):=(
-  regional(ts);
-  C.xy=B.x*[cos(s),sin(s)];
-  Circledata("1",[C,rs],["dr,1.5"]);
-  T.xy=rad*C/(rad+rs);
-  ts=s*(1+rad/rs);
-  P.xy=C+rs*[cos(ts),sin(ts)];
-  Q.xy=C+rs*[cos(ts-pi),sin(ts-pi)];
-  Listplot("f1",[O,C]);
-  Listplot("f2",[C,P],["Color=red"]);
-  Listplot("f3",[C,Q],["do"]);
+  regional(crpt,pt,pc,pt3,cr3,ts);
+  B.xy=rss*[cos(s),sin(s)];
+  Circledata("1",[B,rs]);
+  ts=(rad/rs-1)*s;
+  P.xy=B.xy+rs*[cos(ts),-sin(ts)];
+  Listplot("BP",[B,P],["dr,1.5"]);
   if(Animeflg==1,
     pL=pL++[P.xy];
-    Listplot("gf",pL,["dr,1.5","Color=red"]);
-  );
+    Listplot("c",pL,["dr,1.5","Color=red"]);
+    Circledata("2",[pO,rss],["do"]);
+  );  
 );
 
 ;
@@ -1722,74 +1271,41 @@ mf(s):=(
 <script id="csdraw" type="text/x-cindyscript">
 Ketinit(1.2);
 Setparent(Cdyname()+"fig");
+Setwindow([-5,5],[-5,5]);
+Setax(["","","sw","","sw"]);
 
-rad=2;
-Setwindow([-4*rad-0.5,4*rad+0.5],[-4*rad-0.2,4*rad+0.2]);
-
-Slider("B",[rad,0],[2.5*rad,0]);
-if(B.x<rad+0.5,B.x=rad+0.5);
-rs=B.x-rad;
-
-O.xy=[0,0];
-A.xy=[rad,0];
-pO=[0,0];
-Circledata("0",[pO,rad],["dr,1.5"]);
-Circledata("00",[pO,rad+rs],["do"]);
 ss=Animationparam(0,0.4,[0,8*pi]);
-mf(ss);
 
-if(1==0,//***************************
+pC=[0,0];
+pO=[0,0];
 
+Listplot("S",[[0,0],[rad,0]],["nodisp"]);
+C.y=0;
 
+if(C.x<0.5,C.x=0.2);
+if(C.x>rad-0.2,C.x=rad-0.2);
 
-Putpoint("A",pB+[rs,0],[A.x,0]);
-
-
-
-ad1=["pt1","cr1"];
-
+if(nflag>1,
+  rssq_1=rssq_nflag;
+,
+  rssq_1=C.x;
+);
+C.x=rssq_1;
 op0=["Msg=n"];
 op1=["nodisp","Msg=n"];
-Circledata("1",[pB,rs],op1);
-Pointdata("1",[A],append(op1,"Size=3"));
+rss=C.x;//中心の位置
+rs=rad-rss;//半径
+Circledata("0",[pO,rad],op0);
 
-mf(s):=(
-  regional(crpt,pt,pc,pt3,cr3,tmp);
-  pt=rad*[cos(s),sin(s)];
-  pc=(rad+rs)*[cos(s),sin(s)];
-  crpt=concat(cr1,pt1);
-  Rotatedata("2",crpt,rad*s/rs,prepend(pB,op1));
-  Translatedata("2","rt2",pt-[rad,0],op1);
-  Rotatedata("3","tr2",s,prepend(pt,op1));
-  pt3=rt3_(-1);
-  cr3=rt3_(1..(length(rt3)-1));
-  Pointdata("4",pt3,concat(op0,["Size=3","Color=red"]));
-  Listplot("4",cr3,op0);
-  Listplot("r",[pc,pt3],op0);
-  if(s==0,
-    pL=[A.xy];
-    sL=[0];
-  ,
-    if(Dirflg==1,
-      pL=append(pL,pt3);
-      sL=append(sL,s);
-    ,
-      tmp=select(1..(length(sL)),sL_#<s);
-      if(length(tmp)>0,
-        tmp=tmp_(-1);
-        pL=apply(1..tmp,pL_#);
-        sL=apply(1..tmp,sL_#);
-      );
-    );
-  );
-  if(length(pL)>1,
-    Listplot("c",pL,concat(op0,["do,1.5,2","Color=red"]));
-  );
-);
+mf(ss);
 
 
 
-);//************************************
+
+
+tt1=ss;
+tt0=ss;
+
 
 Figpdf();
 Windispg();
@@ -1810,26 +1326,31 @@ var cdy = CindyJS({
   },
   angleUnit: "°",
   geometry: [
-    {name: "T", type: "Free", pos: [4.0, 0.0, 2.0], color: [1.0, 0.0, 0.0], labeled: false, size: 3.0, border: true },
-    {name: "NE", type: "Free", pos: [4.0, 3.858823529411764, 0.47058823529411764], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
-    {name: "C", type: "Free", pos: [4.0, 0.0, 1.0], color: [1.0, 0.0, 0.0], labeled: false, size: 3.0, border: true },
-    {name: "SW", type: "Free", pos: [4.0, 3.858823529411764, -0.47058823529411764], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
-    {name: "P", type: "Free", pos: [4.0, 0.0, 0.6666666666666666], color: [1.0, 0.0, 0.0], labeled: false, size: 3.0, border: true },
-    {name: "A", type: "Free", pos: [4.0, 0.0, 2.0], color: [1.0, 0.0, 0.0], labeled: false, size: 3.0, border: true },
-    {name: "Q", type: "Free", pos: [4.0, 0.0, 2.0], color: [1.0, 0.0, 0.0], labeled: false, size: 3.0, border: true },
-    {name: "O", type: "Free", pos: [0.0, 0.0, 4.0], color: [1.0, 0.0, 0.0], labeled: false, size: 3.0, border: true },
-    {name: "B", type: "Free", pos: [4.0, 0.0, 1.0], color: [0.0, 0.0, 0.0], labeled: false, size: 1.0, border: true },
-    {name: "Text71", type: "Button", color: [0.0, 0.0, 0.0], fillcolor: [1.0, 0.737, 0.467], fillalpha: 0.27272728085517883, pinned: true, script: "resetclock();\nplayanimation();\nAnimeflg=1;\nDirflg=1;\nsorg=Current;\npL=[];\nsL=[];\n\n", text: "Play", textsize: 18.0, dock: {corner: "LL", offset: [310.0, 38.0]}},
-    {name: "Text73", type: "Button", color: [0.0, 0.0, 0.0], fillcolor: [1.0, 0.737, 0.467], fillalpha: 0.27272728085517883, script: "Animeflg=1-Animeflg;\nif(Animeflg==0,\n  pauseanimation();\n  sorg=sstart;\n,\n  resetclock();\n  playanimation();\n);", text: "Pause", textsize: 18.0, dock: {corner: "LL", offset: [373.0, 38.0]}},
-    {name: "Text74", type: "Button", color: [0.0, 0.0, 0.0], fillcolor: [1.0, 0.737, 0.467], fillalpha: 0.27272728085517883, script: "sorg=sstart;\nDirflg=-Dirflg;\nAnimeflg=1;\nresetclock();\nplayanimation();", text: "Rev", textsize: 18.0, dock: {corner: "LL", offset: [448.0, 38.0]}},
-    {name: "Text72", type: "Button", color: [0.0, 0.0, 0.0], fillcolor: [1.0, 0.737, 0.467], fillalpha: 0.27272728085517883, pinned: true, script: "stopanimation();\nAnimeflg=\"\";\nsstart=Current;\n", text: "Stop", textsize: 18.0, dock: {corner: "LL", offset: [508.0, 38.0]}}
+    {name: "SW", type: "Free", pos: [4.0, 4.0, -0.8], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
+    {name: "NE", type: "Free", pos: [4.0, 4.0, 0.8], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
+    {name: "B", type: "Free", pos: [4.0, 0.0, 1.5263544278079755], color: [1.0, 0.0, 0.0], labeled: false, size: 4.9, border: true },
+    {name: "A", type: "Free", pos: [4.0, -0.0, 1.0], color: [1.0, 0.0, 0.0], labeled: false, size: 3.0, border: true },
+    {name: "P", type: "Free", pos: [4.0, -0.0, 1.0], color: [1.0, 0.0, 0.0], labeled: false, size: 3.0, border: true },
+    {name: "C", type: "Free", pos: [4.0, -0.0, 1.5263544278079755], color: [1.0, 0.0, 0.0], labeled: false, size: 7.0, border: true },
+    {name: "Text71", type: "Button", color: [0.0, 0.0, 0.0], fillcolor: [1.0, 0.737, 0.467], fillalpha: 0.27272728085517883, pinned: true, script: "resetclock();\nplayanimation();\nAnimeflg=1;\nDirflg=1;\nsorg=Current;\npL=[];\nsL=[];", text: "Play", textsize: 18.0, dock: {corner: "LL", offset: [310.0, 24.0]}},
+    {name: "Text73", type: "Button", color: [0.0, 0.0, 0.0], fillcolor: [1.0, 0.737, 0.467], fillalpha: 0.27272728085517883, script: "Animeflg=1-Animeflg;\nif(Animeflg==0,\n  pauseanimation();\n  sorg=sstart;\n,\n  resetclock();\n  playanimation();\n);", text: "Pause", textsize: 18.0, dock: {corner: "LL", offset: [373.0, 24.0]}},
+    {name: "Text74", type: "Button", color: [0.0, 0.0, 0.0], fillcolor: [1.0, 0.737, 0.467], fillalpha: 0.27272728085517883, script: "sorg=sstart;\nDirflg=-Dirflg;\nAnimeflg=1;\nresetclock();\nplayanimation();", text: "Rev", textsize: 18.0, dock: {corner: "LL", offset: [448.0, 24.0]}},
+    {name: "Text72", type: "Button", color: [0.0, 0.0, 0.0], fillcolor: [1.0, 0.737, 0.467], fillalpha: 0.27272728085517883, pinned: true, script: "stopanimation();\nAnimeflg=\"\";\nsstart=Current;\npL=[];\n", text: "Stop", textsize: 18.0, dock: {corner: "LL", offset: [508.0, 24.0]}},
+    {name: "Text0", type: "Button", pos: [4.0, -0.7752092647049621, -0.6687270049243542], color: [0.0, 0.0, 0.0], fillcolor: [0.0, 1.0, 0.0], fillalpha: 1.0, script: "stopanimation();\nAnimeflg=\"\";\nsstart=Current;\nnflag=3;", text: "1/3", textsize: 18.0},
+    {name: "Text1", type: "Button", pos: [4.0, -0.3333333333333333, -0.6666666666666666], color: [0.0, 0.0, 0.0], fillcolor: [0.0, 1.0, 0.0], fillalpha: 1.0, script: "stopanimation();\nAnimeflg=\"\";\nsstart=Current;\nnflag=4;", text: "1/4", textsize: 18.0},
+    {name: "Text2", type: "Button", pos: [4.0, 0.15212371183165935, -0.6679243483204524], color: [0.0, 0.0, 0.0], fillcolor: [0.0, 1.0, 0.0], fillalpha: 1.0, script: "stopanimation();\nAnimeflg=\"\";\nsstart=Current;\nnflag=5;", text: "1/5", textsize: 18.0},
+    {name: "Text6", type: "Button", pos: [4.0, 0.6015680649372406, -0.6701291969740784], color: [0.0, 0.0, 0.0], fillcolor: [0.0, 1.0, 0.0], fillalpha: 1.0, script: "stopanimation();\nAnimeflg=\"\";\nsstart=Current;\nnflag=6;", text: "1/6", textsize: 18.0},
+    {name: "Text7", type: "Button", pos: [4.0, 1.2181434689180783, -0.6679243483204524], color: [0.0, 0.0, 0.0], fillcolor: [0.0, 1.0, 0.0], fillalpha: 1.0, script: "stopanimation();\nAnimeflg=\"\";\nsstart=Current;\nnflag=1;", text: " free ", textsize: 14.0},
+    {name: "Text8", type: "Button", pos: [4.0, -1.743022522988641, -0.6679243483204524], color: [0.0, 0.0, 0.0], fillcolor: [0.0, 1.0, 0.0], fillalpha: 1.0, script: "stopanimation();\nAnimeflg=\"\";\nsstart=Current;\nnflag=2;", text: "1/2", textsize: 18.0},
+    {name: "Text9", type: "Button", pos: [4.0, -2.209539289912527, -0.6657339608044618], color: [0.0, 0.0, 0.0], fillcolor: [0.0, 1.0, 0.0], fillalpha: 1.0, script: "stopanimation();\nAnimeflg=\"\";\nsstart=Current;\nnflag=7;", text: "2/3", textsize: 18.0},
+    {name: "Text10", type: "Button", pos: [4.0, -1.2560752265417583, -0.6679243483204524], color: [0.0, 0.0, 0.0], fillcolor: [0.0, 1.0, 0.0], fillalpha: 1.0, script: "stopanimation();\nAnimeflg=\"\";\nsstart=Current;\nnflag=8;", text: "3/8", textsize: 18.0}
   ],
   ports: [{
-    width: 974,
-    height: 738,
+    width: 918,
+    height: 664,
     id: "CSCanvas",
-    transform: [{visibleRect: [-13.00868620194589, 10.355509827771703, 13.360638169948588, -9.624532663458407]}],
-    grid: 0.5,
+    transform: [{visibleRect: [-8.64017536461163, 7.241196001128334, 9.448036687186493, -5.842216637645037]}],
+    grid: 0.25,
     snap: true,
     background: "rgb(247,247,247)"
   }],

@@ -9,7 +9,7 @@
             margin: 0px;
             padding: 0px;
         }
-
+        
         #CSConsole {
             background-color: #FAFAFA;
             border-top: 1px solid #333333;
@@ -1154,8 +1154,10 @@ Indexall(str,key):=(
 );
 Pointdata(nm,list):=Pointdata(nm,list,[]);
 Pointdata(nm,listorg,optionsorg):=(
-  regional(list,name,opstr,opcindy,Msg,options,Ltype,Noflg,eqL,color,color4,dispflg,//220715
-      size,inside,incolor,ratio,tmp,tmp1,tmp2,tmp3,ngc1,ngc2,ng1,ng2,nc1,nc2);
+  regional(list,name,opstr,opcindy,Msg,options,Ltype,
+              Noflg,eqL,color,color4,dispflg,//220715
+              size,inside,incolor,ratio,tmp,tmp1,tmp2,tmp3,
+              ngc1,ngc2,ng1,ng2,nc1,nc2);
   if(substring(nm,0,1)=="-", //200510[2lines]
     name=substring(nm,1,length(nm));
   ,
@@ -1168,7 +1170,7 @@ Pointdata(nm,listorg,optionsorg):=(
   eqL=tmp_5;
   opstr=tmp_(length(tmp)-1);
   color=tmp_(length(tmp)-2);
-  opcindy="";
+  color4=Colorrgb2cmyk(color);
   size="1";
   dispflg="Y";
   inside="Y"; //200512
@@ -1240,24 +1242,13 @@ Pointdata(nm,listorg,optionsorg):=(
     tmp1=parse(size)*TenSizeInit;
     forall(1..(length(list)),
       if(inside=="N", //210602from
+        Scaledata(tmp2+"i",["cr"+tmp2],1,1/SCALEY,//230423[2line]
+                     ["Color="+color,"Msg=n"]);
         if(length(incolor)>0, //200519from
-          if(isstring(incolor),incolor=Colorname2cmyk(incolor)); // 
-          if(length(incolor)==4,incolor=Colorcmyk2rgb(incolor));
-          tmp2=opcindy+",color->";
-          tmp=["fillcircle("+text(Pcrd(list_#))+","+text(tmp1)+tmp2+text(incolor)+");",[5,0]];
-          GCLIST=append(GCLIST,tmp);
-          tmp=["drawcircle("+text(Pcrd(list_#))+","+text(tmp1)+tmp2+text(color)+");",[5,0]];
-          GCLIST=append(GCLIST,tmp); // 
         );
       ,
-        tmp=[tmp3_1,"Msg=n"]; //220722from
+        tmp=[tmp3_1,"Color="+color,"Msg=n"]; //220722from
         if(Noflg==1,tmp=prepend("notex",tmp));
-          if(length(color)==4,color=Colorcmyk2rgb(color)); // 
-          tmp2=opcindy+",color->"+text(color); //210609
-          tmp=["fillcircle("+text(Pcrd(list_#))+","+text(tmp1)+tmp2+");",[5,0]];
-          GCLIST=append(GCLIST,tmp);
-          tmp=["drawcircle("+text(Pcrd(list_#))+","+text(tmp1)+tmp2+");",[5,0]];
-          GCLIST=append(GCLIST,tmp);  // 
       ); //210602to
       tmp=round(10*sqrt(parse(size))); //201027from (moved)
       if(Noflg==0,options=[Ltype,"Color="+text(color),"Num="+text(tmp)]);
@@ -1269,9 +1260,114 @@ Pointdata(nm,listorg,optionsorg):=(
   ngc2=length(GCLIST); //210422[5lines]
   ng2=length(GLIST);
   nc2=length(COM2ndlist);
-  tmp=[name,list,GCLIST_(ngc1..ngc2),GLIST_(ng1..ng2),COM2ndlist_(nc1..nc2)];  
+  tmp=[name,list,GCLIST_(ngc1..ngc2),
+               GLIST_(ng1..ng2),COM2ndlist_(nc1..nc2)];  
   PointDataList=append(PointDataList,tmp);
   list;
+);
+Scaledata(nm,plist,ratioV):=(
+  regional(tmp);
+  tmp=ratioV; //180603from
+  if(!islist(tmp),tmp=[tmp,tmp]);
+  tmp=Lcrd(tmp);//180603to
+  Scaledata(nm,plist,tmp_1,tmp_2,[]);
+);
+Scaledata(nm,plist,Arg1,Arg2):=(
+  regional(tmp,options);
+  if(islist(Arg2),
+    tmp=Arg1;//180603[2lines]
+    if(!islist(tmp),tmp=[tmp,tmp]);
+    tmp=Lcrd(tmp);
+    options=Arg2;
+    Scaledata(nm,plist,tmp_1,tmp_2,options);
+  ,
+    Scaledata(nm,plist,Arg1,Arg2,[]);
+  );
+);
+Scaledata(nm,plist,rx,ry,optionorg):=(
+  regional(tmp,tmp1,tmp2,pdata,Theta,Pt,Cx,Cy,PdL,options,eqL,
+      opcindy,Nj,Njj,Kj,X2,Y2,Ltype,Noflg,name,color,color4,msgflg);
+  if(substring(nm,0,1)=="-", //210423from
+    name=substring(nm,1,length(nm));
+  ,
+    name="sc"+nm;
+  ); //210423to
+  options=optionorg;
+  Pt=[0,0];
+  tmp=Divoptions(options);
+  Ltype=tmp_1;
+  Noflg=tmp_2;
+  eqL=tmp_5;
+  color=tmp_(length(tmp)-2);
+  color4=Colorrgb2cmyk(color); //200618
+  opcindy=tmp_(length(tmp));
+  tmp1=tmp_6;
+  if(length(tmp1)>0,
+    Pt=Lcrd(tmp1_1);
+  );
+  msgflg="Y"; //190425from
+  forall(eqL,
+    tmp=Strsplit(#,"=");
+    tmp1=Toupper(substring(tmp_1,0,1));
+    if(tmp1=="M",
+      msgflg=Toupper(substring(tmp_2,0,1));
+      options=remove(options,[#]);
+    );
+    if(tmp1=="S", //210423from
+      options=remove(options,[#]);
+    ); //210423to
+  ); //190425to
+  pdata=plist;
+  if(isstring(pdata),pdata=[pdata]);
+  if(!isstring(pdata_1) & Measuredepth(pdata)==1,
+      pdata=[pdata];
+  );
+  Cx=Pt_1; Cy=Pt_2;
+  PdL=[];
+  forall(pdata,Njj,
+    if(isstring(Njj),Kj=parse(Njj),Kj=Njj);
+    if(Measuredepth(Kj)==1,Kj=[Kj]);
+    tmp2=[];
+    forall(Kj,Nj,
+      tmp1=[];
+      forall(Nj,
+        tmp=LLcrd(#);
+        X2=Cx+rx*(tmp_1-Cx);
+        Y2=Cy+ry*(tmp_2-Cy);
+        tmp1=concat(tmp1,[[X2,Y2]]);
+      );
+      if(length(tmp1)==1, //210423from
+        Pointdata("-"+name,tmp1,optionorg);
+      ,
+        tmp2=concat(tmp2,[tmp1]);
+        PdL=concat(PdL,tmp2);
+      );  //210423to
+    );
+  );
+  if(length(PdL)>0,
+    if(Noflg<3,
+      if(msgflg=="Y",
+        println("generate Scaledata "+name);
+      );
+      tmp1=[];
+      forall(PdL,tmp2,
+        tmp=apply(tmp2,Pcrd(#));
+        tmp1=append(tmp1,tmp);
+      );
+      if(length(tmp1)==1,tmp1=tmp1_1);
+      tmp=name+"="+Textformat(tmp1,10)+";"; //190415
+      parse(tmp);
+    );
+    if(Noflg<3, //190818
+      if(isstring(Ltype),
+        Ltype=Getlinestyle(text(Noflg)+Ltype,name);
+      ,
+        if(Noflg==1,Ltype=0);
+      );
+      GCLIST=append(GCLIST,[name,Ltype,opcindy]);
+    );
+  );
+  PdL;
 );
 Bowdata(plist):=Bowdata(plist,[]);
 Bowdata(plist,options):=(
@@ -3768,6 +3864,9 @@ cyan="Color=[1,0,0,0]";
 red="Color=red";
 Addpackage("emath");
 
+inspect(A,"ptsize",7);
+inspect(P,"ptsize",7);
+
 Deffun("f(x)",["regional(y)","y=1.5^x-0.5","y"]);
 Deffun("g(x)",["regional(y)","y=log(x+0.5)/log(1.5)","y"]);
 Deffun("h(x)",["regional(y)","y=1.5^x*log(1.5)","y"]);
@@ -3790,7 +3889,7 @@ Defvar(["a0",A.x,"x0",P.x]);
 Putpoint("A",[a0,f(a0)]);
 Putpoint("P",[x0,f(x0)]);
 
-Letter([A,"nw","A",P,"nw","P"]);
+Letter([A,"n2w2","A",P,"n2w2","P"]);
 
 Listplot("do1",[[a0,0],[a0,f(a0)],[0,f(a0)]],["do"]);
 Listplot("do2",[[x0,0],[x0,f(x0)],[0,f(x0)]],["do"]);
@@ -3854,21 +3953,21 @@ var cdy = CindyJS({
   geometry: [
     {name: "SW", type: "Free", pos: [-2.0, -2.0, 4.0], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
     {name: "NE", type: "Free", pos: [4.0, 4.0, 1.0], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
-    {name: "A", type: "Free", pos: [4.0, 3.8239811533857115, 3.5307631630603926], color: [1.0, 0.0, 0.0], labeled: false, size: 3.0, border: true },
-    {name: "P", type: "Free", pos: [4.0, 3.7056276738411125, 1.45804794593338], color: [1.0, 0.0, 0.0], labeled: false, size: 3.0, border: true }
+    {name: "A", type: "Free", pos: [4.0, 3.8239811533857115, 3.5307631630603926], color: [1.0, 0.0, 0.0], labeled: false, size: 7.0, border: true },
+    {name: "P", type: "Free", pos: [4.0, 3.7056276738411125, 1.45804794593338], color: [1.0, 0.0, 0.0], labeled: false, size: 7.0, border: true }
   ],
   ports: [{
-    id: "CSCanvas",
     width: 560,
-    height: 504,
-    transform: [{visibleRect: [-1.3272695712600988, 4.637113355657667, 4.892571097406473, -0.9607432461422473]}],
+    height: 470,
+    id: "CSCanvas",
+    transform: [{visibleRect: [-1.3272695712600988, 4.637113355657667, 4.892571097406473, -0.5831100626874911]}],
     axes: false,
     grid: 0,
     snap: true,
     background: "rgb(255,255,255)"
   }],
   csconsole: false,
-  cinderella: {build: 2071, version: [3, 0, 2071]}
+  cinderella: {build: 2074, version: [3, 0, 2074]}
 });
     </script>
 </head>
