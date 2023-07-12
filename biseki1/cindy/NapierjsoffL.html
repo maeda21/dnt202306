@@ -2585,6 +2585,23 @@ Setunitlen(UI):=(
 Addax(param):=(
   ADDAXES=text(param);
 );
+Animationparam(start,ratio,stop):=( //190524
+  regional(rng);
+  if(islist(stop),rng=stop,rng=[start,stop]);
+  if(isreal(Animeflg),
+    if(Animeflg==1,
+      sstart=Dirflg*ratio*seconds()+sorg;
+    );
+  ,
+    Current=start;
+    sstart=start;
+  );
+  if((sstart<=rng_1)%(sstart>=rng_2), //190528
+    if(sstart<=rng_1,sstart=rng_1, sstart=rng_2); //190528
+    stopanimation();
+  );
+  sstart;
+);
 Windispg():=(
   if(ADDAXES=="1", //181215from
     Drwxy();
@@ -2885,39 +2902,113 @@ fillpoly(parse("ar"+nm+"h"),color->tmp); //
 );
 Ketcindyjsfigure=1;
 Ketcindyjsscale=1.3;
-ky="";
-nxtflag=3;
+
+stflag=0;
+StBcflag=0;
+kyflag=0;
+nxtflag=0;
+anmflag=0;
 
 inspect(A,"ptsize",1.5);
 inspect(B,"ptsize",1.5);
 inspect(C,"ptsize",1.5);
 println("***********");
+animePlay():=(
+ resetclock();
+ playanimation();
+ Animeflg=1;
+ Dirflg=1;
+ sorg=Current;
+ pauseanimation();
+ sorg=sstart;stflag=2;
+);
+animeStop():=(
+ stopanimation();
+ Animeflg=0;
+ sstart=Current;
+ kyflag=0;stflag=0;
+ anmflag=0;nxtflag=0;
+);
+animePause():=(
+ Animeflg=0;stflag=2;
+ pauseanimation();
+ sorg=sstart;
+);
+animeMove():=(
+ Animeflg=1;stflag=1;
+ resetclock();
+ playanimation();
+);
+
+Aval=[2.0];
+vtmp=0.02;atmp=2.0;
+repeat(25,j,
+  atmp=atmp+vtmp;
+  Aval=Aval++[atmp];
+);
+vtmp=0.01;
+repeat(10,j,
+  atmp=atmp+vtmp;
+  Aval=Aval++[atmp];
+);
+vtmp=0.005;
+repeat(20,j,
+  atmp=atmp+vtmp;
+  Aval=Aval++[atmp];
+);
+vtmp=0.001;
+repeat(18,j,
+  atmp=atmp+vtmp;
+  Aval=Aval++[atmp];
+);
+Aval=Aval++[2.7181,2.7182,2.71828];
 Scale=1.3;
 Xs=-0.5;Xe=1.8;
 Ys=-0.5;Ye=3.5;
 cyan=[1,1,0,0];
 red=[0,1,1,0];
+pt1=[6.5,-1.5];
 IntCst():=(
- Text0.xy=[-1.7,-1.5];
- ptc=[-0.65,-1.25];dx=2.3/2;dy=1.15/2;
- Listplot("Shd",[ptc-[dx,dy],ptc+[dx,-dy],ptc+[dx,dy],ptc+[-dx,dy],ptc-[dx,dy]],
-   ["Color=green"]);
- Shade(["sgShd"],["Color=green"]);
- Letter(ptc,"c","Next",["Size=1.3"]);
- if(nxtflag>3,
-  Text3.xy=[-1.7,0];
-  ptc=[-0.65,0.25];dx=2.3/2;dy=1.15/2;
-  Listplot("Shd2",[ptc-[dx,dy],ptc+[dx,-dy],ptc+[dx,dy],ptc+[-dx,dy],ptc-[dx,dy]],
-    ["Color=yellow"]);
+ Text0.xy=pt1;//[-1.7,-1.5];
+ ptc=pt1+[1.05,0.25];//[-0.65,-1.25];
+ dx=2.3/2;dy=1.15/2;
+ Listplot("Shd1",[ptc-[dx,dy],ptc+[dx,-dy],ptc+[dx,dy],ptc+[-dx,dy],ptc-[dx,dy]],
+   ["nodisp"]);
+ ptc2=pt1+[1.05,1.75];//[-0.65,0.25];
+ Listplot("Shd2",
+   [ptc2-[dx,dy],ptc2+[dx,-dy],ptc2+[dx,dy],ptc2+[-dx,dy],ptc2-[dx,dy]],
+   ["nodisp"]);
+ if(kyflag==0,
+  Shade(["sgShd1"],["Color=green"]);
+  Letter(ptc,"c","Next",["Size=1.3"]);
+  Text3.xy=[6.5,-6];
+ );
+ if(kyflag==1 & anmflag==0 & nxtflag==0,
+  Shade(["sgShd1"],["Color=green"]);
+  Letter(ptc,"c","Start",["Size=1.3"]);
+ );
+ if(anmflag==1 & nxtflag==0,
+  Shade(["sgShd1"],["Color=yellow"]);
+  Letter(ptc,"c","Poase",["Size=1.3"]);
+  Text3.xy=pt1+[0,1.5];
+  Shade(["sgShd2"],["Color=red"]);
+  Letter(ptc2,"c","Stop",["Size=1.3"]);
+ );
+ if(anmflag==0 & nxtflag==1,
+  Shade(["sgShd1"],["Color=green"]);
+  Letter(ptc,"c","Forward",["Size=1.2"]);
+  Text3.xy=pt1+[0,1.5];
   Shade(["sgShd2"],["Color=yellow"]);
-  Letter(ptc,"c","Back",["Size=1.3"]);
- ,
-  Text3.xy=[-1.7,-5];
+  Letter(ptc2,"c","Backword",["Size=1.1"]);
+ );
+ if(anmflag==1 & nxtflag==1,
+  Shade(["sgShd1"],["Color=red"]);
+  Letter(ptc,"c","Stop",["Size=1.3"]);
  );
  ptc=[(XMIN+XMAX)/2,YMAX-1.5];dx=2.7/2;dy=1.0/2;
- Listplot("Shd1",[ptc-[dx,dy],ptc+[dx,-dy],ptc+[dx,dy],ptc+[-dx,dy],ptc-[dx,dy]],
+ Listplot("Shd0",[ptc-[dx,dy],ptc+[dx,-dy],ptc+[dx,dy],ptc+[-dx,dy],ptc-[dx,dy]],
    ["Color=green"]);
- Shade(["sgShd1"],["Color=green"]);
+ Shade(["sgShd0"],["Color=green"]);
  Letter(ptc,"c","$e\,$の定義",["Size=1.3"]);
 );
 DNvec(pt1,pt2):=(
@@ -2954,6 +3045,7 @@ Plotgrph0(fstr,xs,xe,nn):=(
  );
  tmplst;
 );
+
 Tickmark(nam,pt,ln,s):=(
  if(s=="x",
   Listplot(nam,[pt-[0,1]*ln/2,pt+[0,1]*ln/2],["dr,0.7"]);
@@ -2983,16 +3075,22 @@ WriteG(n,org,aa,rt,k):=(
    Expr([0,Ye]*rt+org+[0.2,0.5],"n3e5","a="+substring(format(aa,4)+".0000",0,6),
         ["Size=0.9"]);
   ,
-   Expr([0,aa]*rt+org,"w3",substring(format(aa,4)+"0000",0,6),
-        ["Size=0.7"]);
-   Expr([0,Ye]*rt+org+[0.2,0.5],"n3e5","a="+substring(format(aa,4)+"0000",0,6),
-        ["Size=0.9"]);
    if(aa==2.71828,
-    Letter([-0.7,-0.52]*rt+org,"e",
-    "$a=\,$"+format(aa,5)+"のとき，傾き："+format(log(aa),k),["Color=blue"]);   
+    Letter([-0.2,-0.4]*rt+org,"e","$a=\,$"+format(aa,5)+"のとき",["Color=blue"]);   
+    Letter([-0.2,-0.7]*rt+org,"e","傾き："+format(log(aa),k),["Color=blue"]);   
+    Expr([0,aa]*rt+org,"w3",substring(format(aa,5)+"0000",0,7),
+         ["Size=0.7"]);
+    Expr([0,Ye]*rt+org+[0.2,0.5],"n3e5","a="+substring(format(aa,5)+"0000",0,7),
+         ["Size=0.9"]);
    ,
-    Letter([-0.7,-0.52]*rt+org,"e",
-    "$a=\,$"+substring(format(aa,4)+"0000",0,6)+"のとき，傾き："+format(log(aa),k));
+    Expr([0,aa]*rt+org,"w3",substring(format(aa,4)+"0000",0,6),
+         ["Size=0.7"]);
+    Expr([0,Ye]*rt+org+[0.2,0.5],"n3e5","a="+substring(format(aa,4)+"0000",0,6),
+         ["Size=0.9"]);
+    Letter([-0.2,-0.4]*rt+org,"e",
+    "$a=\,$"+substring(format(aa,4)+"0000",0,6)+"のとき");
+    Letter([-0.2,-0.7]*rt+org,"e",
+    "傾き："+format(log(aa),k));
    );
   );
  ,
@@ -3034,11 +3132,11 @@ Ketinit();
 Setketcindyjs(["Axes=false","Scale="+Scale,"Color=white","Grid=0","Figure=y"]);
 Fontsize("s");
 Setunitlen(text(Scale)+"cm");
-Setwindow([-2,9],[-2,12]);
+Setwindow([-3.5,9],[-2,12]);
 Addax(0);
 
 IntCst();
-if(nxtflag==3,
+if(kyflag==0,
  org=[-0.8,0.4];rt=1.3;
   WriteG(1,org,2,rt,3);A.xy=[0,1]*rt+org;
   Letter(org+[0,3.9],"e","傾き$\,<1$");
@@ -3048,40 +3146,53 @@ if(nxtflag==3,
  org=[6.2,0.4];
   WriteG(3,org,3,rt,3);C.xy=[0,1]*rt+org;
   Letter(org+[0,3.9],"e","傾き$\,>1$");
- Letter([XMIN+0.5,YMAX-2.8],"e",
+ Letter([XMIN+1.5,YMAX-2.8],"e",
   "　関数$y=a^x$の$x=0$における接線の傾きが1となる");
- Letter([XMIN+0.5,YMAX-3.6],"e",
+ Letter([XMIN+1.5,YMAX-3.6],"e",
   "ときの$a$の値を調べよう．");
- Letter([XMIN+0.5,YMAX-4.4],"e",
+ Letter([XMIN+1.5,YMAX-4.4],"e",
   "　関数$y=a^x$は$\,a\,$の値が大きくなると関数$\,y\,$の変化");
- Letter([XMIN+0.5,YMAX-5.2],"e",
+ Letter([XMIN+1.5,YMAX-5.2],"e",
   "も大きくなる．関数$\,y\,$の変化が大きいと接線の傾き");
- Letter([XMIN+0.5,YMAX-6.0],"e",
+ Letter([XMIN+1.5,YMAX-6.0],"e",
   "も大きくなる．");
- Letter([XMIN+0.5,YMAX-6.8],"e",
+ Letter([XMIN+1.5,YMAX-6.8],"e",
   "　下図より，$a\,$の値は2.5から3の間であるといえる．");
 );
-aval=2.5;
-if(nxtflag>3,
-  org=[2.5,0.1];rt=2.4;
+if(kyflag==1 & nxtflag==0 & anmflag==0,
+  org=[1.3,0.1];rt=2.4;
   A.xy=[0,1]*rt+org;B.xy=[0,1]*rt+org;C.xy=[0,1]*rt+org;
-  n=nxtflag-4;
-  an=0;
-  if(n<16,
-    aval=aval+0.01*n;
-  );
-  if(n>15 & n<28,
-    aval=2.65+0.005*(n-15);
-  );
-  if(n>27 & n<36,
-    aval=2.71+0.001*(n-27);
-  );
-  if(n>35 & n<39,
-    aval=2.718+0.0001*(n-35);
-  );
-  if(n>38,aval=2.71828;nxtflag=43;);
-  WriteG(nxtflag,org,aval,rt,7);B.xy=[0,1]*rt+org;
+  WriteG(1,org,2,rt,7);
 );
+
+ssMax=length(Aval);
+ss=Animationparam(1,3,ssMax);
+
+if(kyflag>0,
+A.xy=[0,1]*rt+org;B.xy=[0,1]*rt+org;C.xy=[0,1]*rt+org;
+if(anmflag==1 & stflag==0,
+  animePlay();
+  pauseanimation();
+  sorg=sstart;  
+);
+if(anmflag==1 & stflag==2,
+  animeMove();
+);
+if(anmflag==0 & stflag==1 & nxtflag==1,
+  animePause();
+);
+if(anmflag==2,animeStop());
+st=floor(ss);
+if(st==1 & kyflag>2,
+  kyflag=1;nxtflag=0;anmflag=1;stflag=0;
+);
+println(Aval_st);
+org=[1.3,0.1];rt=2.4;
+WriteG(4,org,Aval_st,rt,7);//B.xy=[0,1]*rt+org;
+
+
+);
+
 
 Windispg();
 
@@ -3101,19 +3212,19 @@ var cdy = CindyJS({
   },
   angleUnit: "°",
   geometry: [
-    {name: "SW", type: "Free", pos: [4.0, 4.0, -2.0], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
+    {name: "SW", type: "Free", pos: [4.0, 2.2857142857142856, -1.1428571428571428], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
     {name: "NE", type: "Free", pos: [-3.0, -4.0, -0.3333333333333333], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
     {name: "A", type: "Free", pos: [1.8823529411764706, -4.0, -2.352941176470588], color: [0.0, 0.0, 0.0], labeled: false, size: 1.5, border: true },
     {name: "B", type: "Free", pos: [4.0, 2.5185185185185186, 1.4814814814814814], color: [0.0, 0.0, 0.0], labeled: false, size: 1.5, border: true },
     {name: "C", type: "Free", pos: [4.0, 1.096774193548387, 0.6451612903225806], color: [0.0, 0.0, 0.0], labeled: false, size: 1.5, border: true },
-    {name: "Text0", type: "Button", pos: [4.0, 3.5294117647058827, -2.3529411764705883], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, alpha: 0.15384615384615385, script: "nxtflag=nxtflag+1;", text: "　　　", textsize: 31},
-    {name: "Text3", type: "Button", pos: [-1.36, -4.0, 0.8], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "nxtflag=nxtflag-1;", text: "　　　", textsize: 31}
+    {name: "Text0", type: "Button", pos: [4.0, -0.9230769230769231, 0.6153846153846154], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, alpha: 0.15384615384615385, script: "if(kyflag>0,\n if(anmflag==0,\n  Dirflg=1;\n  if(nxtflag==0,\n    anmflag=1;\n  ,\n    anmflag=1;nxtflag=0;\n  );\n ,\n  if(nxtflag==0,\n    anmflag=0;nxtflag=1;\n  ,\n    anmflag=0;nxtflag=0;kyflag=0;\n  );\n );\n kyflag=kyflag+1;\n,\n kyflag=1;\n);", text: "　　　", textsize: 31},
+    {name: "Text3", type: "Button", pos: [4.0, -3.6923076923076925, 0.6153846153846154], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "kyflag=kyflag+1;\nif(anmflag==1 & nxtflag==0,\n  anmflag=2;\n  Text3.xy=[6.5,-6];\n);\nif(anmflag==0 & nxtflag==1,\n  anmflag=1;nxtflag=0;\n  Dirflg=-1;stflag=2;\n);\n", text: "　　　", textsize: 31}
   ],
   ports: [{
-    width: 531,
+    width: 597,
     height: 663,
     id: "CSCanvas",
-    transform: [{visibleRect: [-2.5,12.5,9.5,-2.5]}],
+    transform: [{visibleRect: [-4,12.5,9.5,-2.5]}],
     grid: 0,
     snap: true,
     background: "rgb(255,255,255)"
