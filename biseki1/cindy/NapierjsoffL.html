@@ -2961,7 +2961,7 @@ repeat(18,j,
   atmp=atmp+vtmp;
   Aval=Aval++[atmp];
 );
-Aval=Aval++[2.7181,2.7182,2.71828];
+Aval=Aval++[2.7181,2.7182,2.71828,2.718281];
 Scale=1.3;
 Xs=-0.5;Xe=1.8;
 Ys=-0.5;Ye=3.5;
@@ -3075,22 +3075,31 @@ WriteG(n,org,aa,rt,k):=(
    Expr([0,Ye]*rt+org+[0.2,0.5],"n3e5","a="+substring(format(aa,4)+".0000",0,6),
         ["Size=0.9"]);
   ,
-   if(aa==2.71828,
-    Letter([-0.2,-0.4]*rt+org,"e","$a=\,$"+format(aa,5)+"のとき",["Color=blue"]);   
+   if(aa==2.718281,
+    Letter([-0.2,-0.4]*rt+org,"e","$a=\,$"+format(aa,6)+"のとき",["Color=blue"]);   
     Letter([-0.2,-0.7]*rt+org,"e","傾き："+format(log(aa),k),["Color=blue"]);   
-    Expr([0,aa]*rt+org,"w3",substring(format(aa,5)+"0000",0,7),
+    Expr([0,aa]*rt+org,"w3",substring(format(aa,6)+"0000",0,8),
          ["Size=0.7"]);
-    Expr([0,Ye]*rt+org+[0.2,0.5],"n3e5","a="+substring(format(aa,5)+"0000",0,7),
+    Expr([0,Ye]*rt+org+[0.2,0.5],"n3e5","a="+substring(format(aa,6)+"0000",0,8),
          ["Size=0.9"]);
    ,
-    Expr([0,aa]*rt+org,"w3",substring(format(aa,4)+"0000",0,6),
-         ["Size=0.7"]);
-    Expr([0,Ye]*rt+org+[0.2,0.5],"n3e5","a="+substring(format(aa,4)+"0000",0,6),
-         ["Size=0.9"]);
-    Letter([-0.2,-0.4]*rt+org,"e",
-    "$a=\,$"+substring(format(aa,4)+"0000",0,6)+"のとき");
-    Letter([-0.2,-0.7]*rt+org,"e",
-    "傾き："+format(log(aa),k));
+    if(aa==2.71828,
+     Letter([-0.2,-0.4]*rt+org,"e","$a=\,$"+format(aa,5)+"のとき",["Color=blue"]);   
+     Letter([-0.2,-0.7]*rt+org,"e","傾き："+format(log(aa),k),["Color=blue"]);   
+     Expr([0,aa]*rt+org,"w3",substring(format(aa,5)+"0000",0,7),
+          ["Size=0.7"]);
+     Expr([0,Ye]*rt+org+[0.2,0.5],"n3e5","a="+substring(format(aa,5)+"0000",0,7),
+          ["Size=0.9"]);
+    ,
+     Expr([0,aa]*rt+org,"w3",substring(format(aa,4)+"0000",0,6),
+          ["Size=0.7"]);
+     Expr([0,Ye]*rt+org+[0.2,0.5],"n3e5","a="+substring(format(aa,4)+"0000",0,6),
+          ["Size=0.9"]);
+     Letter([-0.2,-0.4]*rt+org,"e",
+       "$a=\,$"+substring(format(aa,4)+"0000",0,6)+"のとき");
+     Letter([-0.2,-0.7]*rt+org,"e",
+       "傾き："+format(log(aa),k));
+    );
    );
   );
  ,
