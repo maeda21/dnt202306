@@ -2469,16 +2469,16 @@ inD(x,y):=(
   dt;
 );
 IntCst():=(
- inspect(TH,"ptsize",7);
- Listplot("TH",[[XMIN,Thys],[XMIN,Thye]],["dr,2","Color=green"]);
- TH.x=XMIN;
+ inspect(TH,"ptsize",10);
+ Listplot("TH",[[XMAX,Thys],[XMAX,Thye]],["dr,2","Color=green"]);
+ TH.x=XMAX;
  if(TH.y<Thye,TH.y=Thye);
  if(TH.y>Thys,TH.y=Thys);
  THETA0=Ths0+(The0-Ths0)*(Thys-TH.y)/(Thys-Thye);
  THETA0=floor((THETA0+1)/2)*2;
  THETA=THETA0/180*pi;
- Expr(TH,"w5",THETA0);
- inspect(FI,"ptsize",7);
+ Expr(TH,"e8",THETA0);
+ inspect(FI,"ptsize",10);
  Listplot("FI",[[Phxs,YMIN],[Phxe,YMIN]],["dr,2","Color=green"]);
  FI.y=YMIN;
  if(FI.x<Phxs,FI.x=Phxs);
@@ -2490,7 +2490,7 @@ IntCst():=(
    if(PHI0<=3,PHI0=1);
  );
  PHI=PHI0/180*pi;
- Expr(FI,"s5",format(PHI0,0));
+ Expr(FI,"s8",format(PHI0,0));
  CosP=cos(PHI);SinP=sin(PHI);
  CosP2=CosP^2;SinP2=SinP^2;
  Cos2P=CosP2-SinP2;Sin2P=2*SinP*CosP;
@@ -2904,14 +2904,14 @@ var cdy = CindyJS({
   geometry: [
     {name: "SW", type: "Free", pos: [4.0, 4.0, -0.7272727272727273], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
     {name: "NE", type: "Free", pos: [4.0, 4.0, 0.7272727272727273], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
-    {name: "TH", type: "Free", pos: [4.0, -0.6872262133170909, -0.7272727272727273], color: [1.0, 0.0, 0.0], labeled: true, size: 7.0, border: true },
-    {name: "FI", type: "Free", pos: [-0.3876660690501817, -4.0, 0.7272727272727273], color: [1.0, 0.0, 0.0], labeled: true, size: 7.0, border: true }
+    {name: "TH", type: "Free", pos: [4.0, 0.6872262133170909, 0.7272727272727273], color: [1.0, 0.0, 0.0], labeled: true, size: 10.0, border: true },
+    {name: "FI", type: "Free", pos: [-0.3876660690501817, -4.0, 0.7272727272727273], color: [1.0, 0.0, 0.0], labeled: true, size: 10.0, border: true }
   ],
   ports: [{
     width: 1026,
-    height: 728,
+    height: 708,
     id: "CSCanvas",
-    transform: [{visibleRect: [-10.067203230655585, 7.523144652511575, 10.64870233423136, -7.183936842092373]}],
+    transform: [{visibleRect: [-10.067203230655585, 7.523144652511575, 10.64870233423136, -6.7720416437262]}],
     axes: false,
     grid: 0,
     snap: true,

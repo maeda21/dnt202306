@@ -2659,16 +2659,16 @@ Phe0=360;Phe=Phe0/180*pi;
 Phxs=-4; Phxe=4;
 
 IntCnst():=(
- inspect(TH,"ptsize",7);
- Listplot("TH",[[XMIN,Thys],[XMIN,Thye]],["dr,2","Color=green"]);
- TH.x=XMIN;
+ inspect(TH,"ptsize",10);
+ Listplot("TH",[[XMAX,Thys],[XMAX,Thye]],["dr,2","Color=green"]);
+ TH.x=XMAX;
  if(TH.y<Thye,TH.y=Thye);
  if(TH.y>Thys,TH.y=Thys);
  THETA0=Ths0+(The0-Ths0)*(Thys-TH.y)/(Thys-Thye);
  THETA0=floor((THETA0+1)/2.5)*2.5;
  THETA=THETA0/180*pi;
- Expr(TH,"w5",THETA0);
- inspect(FI,"ptsize",7);
+ Expr(TH,"e8",THETA0);
+ inspect(FI,"ptsize",10);
  Listplot("FI",[[Phxs,YMIN],[Phxe,YMIN]],["dr,3","Color=green"]);
  FI.y=YMIN;
  if(FI.x<Phxs,FI.x=Phxs);
@@ -2676,7 +2676,7 @@ IntCnst():=(
  PHI0=Phs0+(Phe0-Phs0)*(FI.x-Phxs)/(Phxe-Phxs);
  PHI0=floor((PHI0+1)/5)*5;
  PHI=PHI0/180*pi;
- Expr(FI,"s5",PHI0);
+ Expr(FI,"s8",PHI0);
  CosP=cos(PHI);SinP=sin(PHI);
  CosP2=CosP^2;SinP2=SinP^2;
  Cos2P=CosP2-SinP2;Sin2P=2*SinP*CosP;
@@ -3124,14 +3124,14 @@ var cdy = CindyJS({
   geometry: [
     {name: "SW", type: "Free", pos: [4.0, 4.0, -0.6153846153846154], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
     {name: "NE", type: "Free", pos: [-3.3846153846153846, -4.0, -0.6153846153846154], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
-    {name: "TH", type: "Free", pos: [4.0, -0.5393535589938462, -0.6153846153846154], color: [1.0, 0.0, 0.0], labeled: true, size: 7.0, border: true },
-    {name: "FI", type: "Free", pos: [-0.8724836983729232, -4.0, 0.6153846153846154], color: [1.0, 0.0, 0.0], labeled: true, size: 7.0, border: true }
+    {name: "TH", type: "Free", pos: [4.0, 0.6374178424472727, 0.7272727272727273], color: [1.0, 0.0, 0.0], labeled: true, size: 10.0, border: true },
+    {name: "FI", type: "Free", pos: [-0.8724836983729232, -4.0, 0.6153846153846154], color: [1.0, 0.0, 0.0], labeled: true, size: 10.0, border: true }
   ],
   ports: [{
     width: 832,
-    height: 675,
+    height: 658,
     id: "CSCanvas",
-    transform: [{visibleRect: [-11.999625228870498, 9.138275281706964, 9.447610411130048, -8.261825748341556]}],
+    transform: [{visibleRect: [-11.999625228870498, 9.138275281706964, 9.447610411130048, -7.823600981658853]}],
     grid: 0,
     snap: true,
     background: "rgb(255,255,255)"

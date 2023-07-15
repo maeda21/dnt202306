@@ -2808,16 +2808,17 @@ Eps=0.00001;
 Eps2=Eps^2;
 R1=2;R2=2*R1;R2p=R2*R2;
 IntCst():=(
- inspect(TH,"ptsize",7);
- Listplot("TH",[[XMIN,Thys],[XMIN,Thye]],["dr,2","Color=green"]);
- TH.x=XMIN;
+ inspect(TH,"ptsize",10);
+ Thys=5;Thye=-3;
+ Listplot("TH",[[XMAX,Thys],[XMAX,Thye]],["dr,2","Color=green"]);
+ TH.x=XMAX;
  if(TH.y<Thye,TH.y=Thye);
  if(TH.y>Thys,TH.y=Thys);
  THETA0=Ths0+(The0-Ths0)*(Thys-TH.y)/(Thys-Thye);
  THETA0=floor((THETA0+1)/2.5)*2.5;
  THETA=THETA0/180*pi;
- Expr(TH,"w5",THETA0);
- inspect(FI,"ptsize",7);
+ Expr(TH,"e8",THETA0);
+ inspect(FI,"ptsize",10);
  Listplot("FI",[[Phxs,YMIN],[Phxe,YMIN]],["dr,3","Color=green"]);
  FI.y=YMIN;
  if(FI.x<Phxs,FI.x=Phxs);
@@ -2825,7 +2826,7 @@ IntCst():=(
  PHI0=Phs0+(Phe0-Phs0)*(FI.x-Phxs)/(Phxe-Phxs);
  PHI0=floor((PHI0+1)/5)*5;
  PHI=PHI0/180*pi;
- Expr(FI,"s5",PHI0);
+ Expr(FI,"s8",PHI0);
  CosP=cos(PHI);SinP=sin(PHI);
  CosP2=CosP^2;SinP2=SinP^2;
  Cos2P=CosP2-SinP2;Sin2P=2*SinP*CosP;
@@ -3180,6 +3181,8 @@ Setwindow([-5.5,5.5],[-5,7]);
 
 Setketcindyjs(["Axes=false","Scale=1","Color=white","Grid=0"]);
 
+println([Thys,Thye]);
+
 IntCst();
 println([THETA0,PHI0]);
 
@@ -3286,14 +3289,14 @@ var cdy = CindyJS({
   geometry: [
     {name: "SW", type: "Free", pos: [4.0, 3.6363636363636362, -0.7272727272727273], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
     {name: "NE", type: "Free", pos: [-3.142857142857143, -4.0, -0.5714285714285714], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
-    {name: "TH", type: "Free", pos: [4.0, -2.5365000421912725, -0.7272727272727273], color: [1.0, 0.0, 0.0], labeled: true, size: 7.0, border: true },
-    {name: "FI", type: "Free", pos: [-2.3023615767584, -4.0, 0.8], color: [1.0, 0.0, 0.0], labeled: true, size: 7.0, border: true }
+    {name: "TH", type: "Free", pos: [4.0, 1.1706923271650906, 0.7272727272727273], color: [1.0, 0.0, 0.0], labeled: true, size: 10.0, border: true },
+    {name: "FI", type: "Free", pos: [-2.692592352480001, -4.0, 0.8], color: [1.0, 0.0, 0.0], labeled: true, size: 10.0, border: true }
   ],
   ports: [{
     width: 951,
-    height: 660,
+    height: 717,
     id: "CSCanvas",
-    transform: [{visibleRect: [-11.35327663115401, 10.109416033541004, 11.841065100806171, -5.987603464980257]}],
+    transform: [{visibleRect: [-11.35327663115401, 10.109416033541004, 11.841065100806171, -7.377800603488911]}],
     grid: 0,
     snap: true,
     background: "rgb(255,255,255)"
